@@ -19,10 +19,10 @@ import { TasksService } from './tasks.service';
 export class TasksController {
   constructor(private readonly taskService: TasksService) {}
 
-  // @Get()
-  // getAllTasks(@Query() filteration: GetTasksDto): Task[] {
-  //   return this.taskService.getAllTasks(filteration);
-  // }
+  @Get()
+  getAllTasks(@Query() filteration: GetTasksDto): Promise<Task[]> {
+    return this.taskService.getAllTasks(filteration);
+  }
 
   @Get(':id')
   getTaskById(@Param('id') id: string): Promise<Task> {

@@ -1,4 +1,5 @@
 import { EntityRepository, Repository } from 'typeorm';
+import { GetTasksDto } from './dto/get-tasks.dto';
 import { TaskStatus } from './task-status.enum';
 import { Task } from './task.entity';
 
@@ -12,5 +13,24 @@ export class TasksRepository extends Repository<Task> {
     });
 
     return this.save(task);
+  }
+
+  getTasks(filter: GetTasksDto): Promise<Task[]> {
+    const { query, status } = filter;
+
+    const result = this.createQueryBuilder('task');
+
+    if (status) {
+      result.andWhere('task.status = :status', { status });
+    }
+
+    if (query) {
+      result.andWhere(
+        'LOWER(task.title) LIKE LOWER(:query) OR LOWER(task.description) LIKE LOWER(:query)',
+        { query: `%${query}%` },
+      );
+    }
+
+    return result.getMany();
   }
 }
