@@ -17,10 +17,11 @@ export class TasksRepository extends Repository<Task> {
     return this.save(task);
   }
 
-  getTasks(filter: GetTasksDto): Promise<Task[]> {
+  getTasks(filter: GetTasksDto, user: User): Promise<Task[]> {
     const { query, status } = filter;
 
     const result = this.createQueryBuilder('task');
+    result.where({ user });
 
     if (status) {
       result.andWhere('task.status = :status', { status });
@@ -28,7 +29,7 @@ export class TasksRepository extends Repository<Task> {
 
     if (query) {
       result.andWhere(
-        'LOWER(task.title) LIKE LOWER(:query) OR LOWER(task.description) LIKE LOWER(:query)',
+        '(LOWER(task.title) LIKE LOWER(:query) OR LOWER(task.description) LIKE LOWER(:query))',
         { query: `%${query}%` },
       );
     }
